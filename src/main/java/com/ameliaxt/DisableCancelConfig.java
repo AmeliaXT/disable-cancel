@@ -30,23 +30,23 @@ public interface DisableCancelConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "itemsToIgnore",
-		name = "Ignore for items",
-		description = "Allows individual items to ignore the prevention of cancellation. Comma separated list, e.g. 'law rune, guam herb'"
+		keyName = "disableCancelOnItems",
+		name = "Specific items only",
+		description = "Allows individual items to ignore the prevention of cancellation. Does not work if 'All items' is checked. Comma separated list, e.g. 'law rune, guam herb'"
 	)
 
-	default String itemsToIgnore()
+	default String disableCancelOnItems()
 	{
         return "";
     }
 
 	@ConfigItem(
-		keyName = "spellsToIgnore",
-		name = "Ignore for spells",
-		description = "Allows inidvidual spells to ignore the prevention of cancellation. Comma separated list, e.g. 'telekinetic grab, ice barrage'"
+		keyName = "disableCancelOnSpells",
+		name = "Specific spells only",
+		description = "Allows inidvidual spells to ignore the prevention of cancellation. Does not work if 'All spells' is checked. Comma separated list, e.g. 'telekinetic grab, ice barrage'"
 	)
 
-	default String spellsToIgnore()
+	default String disableCancelOnSpells()
 	{
         return "";
     }

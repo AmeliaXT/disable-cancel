@@ -30,28 +30,28 @@ public class DisableCancelPlugin extends Plugin {
 	@Inject
 	private DisableCancelConfig config;
 
-	private boolean itemIgnored(int itemId) {
-		final boolean cfgDisableForAllItems = config.disableForAllSpells();
+	private boolean disableCancelForItem(int itemId) {
+		final boolean cfgDisableForAllItems = config.disableForAllItems();
 
 		if (cfgDisableForAllItems) {
-			return false;
+			return true;
 		}
 
 		final String itemName = itemManager.getItemComposition(itemId).getMembersName().toLowerCase();
-		final String[] cfgItemsToIgnore = config.itemsToIgnore().toLowerCase().split(" *, *");
+		final String[] cfgDisableCancelOnItems = config.disableCancelOnItems().toLowerCase().split(" *, *");
 
-		if (Arrays.asList(cfgItemsToIgnore).contains(itemName)) {
+		if (Arrays.asList(cfgDisableCancelOnItems).contains(itemName)) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private boolean spellIgnored(Widget widget) {
-		final boolean cfgDisableForAllSpells = config.disableForAllItems();
+	private boolean disableCancelForSpell(Widget widget) {
+		final boolean cfgDisableForAllSpells = config.disableForAllSpells();
 
 		if (cfgDisableForAllSpells) {
-			return false;
+			return true;
 		}
 
 		int spellId = widget.getId();
@@ -62,56 +62,60 @@ public class DisableCancelPlugin extends Plugin {
 			return false;
 		}
 
-		final String[] cfgSpellsToIgnore = config.spellsToIgnore().toLowerCase().split(" *, *");
+		final String[] cfgDisableCancelOnSpells = config.disableCancelOnSpells().toLowerCase().split(" *, *");
 
-		if (Arrays.asList(cfgSpellsToIgnore).contains(spellString)) {
+		if (Arrays.asList(cfgDisableCancelOnSpells).contains(spellString)) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private boolean shouldIgnoreRightClickMenu() {
+	private boolean disableForRightClickOption() {
 		final boolean cfgLeftClickOnly = config.leftClickOnly();
 
-		if (cfgLeftClickOnly && client.isMenuOpen()) {
+		if (cfgLeftClickOnly) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private boolean shouldDisableCancel(MenuOptionClicked option) {
-		final Widget selectedWidget = client.getSelectedWidget();
-
+	private boolean shouldDisableOption(MenuOptionClicked option) {
 		final MenuAction action = option.getMenuAction();
 
-		if (selectedWidget == null || action != MenuAction.CANCEL) {
-			return false;
+		final boolean isCancel = action == MenuAction.CANCEL;
+
+		if (isCancel) {
+			if (client.isMenuOpen() && disableForRightClickOption()) {
+				return false;
+			}
+
+			final Widget selectedWidget = client.getSelectedWidget();
+
+			if (selectedWidget == null) {
+				return false;
+			}
+
+			final int itemId = selectedWidget.getItemId();
+
+			final boolean isItem = itemId > 0;
+
+			if (isItem && disableCancelForItem(itemId)) {
+				return true;
+			}
+
+			if (!isItem && disableCancelForSpell(selectedWidget)) {
+				return true;
+			}
 		}
 
-		final int itemId = selectedWidget.getItemId();
-
-		final boolean isItem = itemId > 0;
-
-		if (isItem && itemIgnored(itemId)) {
-			return false;
-		}
-
-		if (!isItem && spellIgnored(selectedWidget)) {
-			return false;
-		}
-
-		if (shouldIgnoreRightClickMenu()) {
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked option) {
-		if (!shouldDisableCancel(option)) {
+		if (!shouldDisableOption(option)) {
 			return;
 		}
 
