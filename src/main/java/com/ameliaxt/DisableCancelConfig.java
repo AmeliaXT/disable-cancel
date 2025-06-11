@@ -8,25 +8,25 @@ import net.runelite.client.config.ConfigItem;
 public interface DisableCancelConfig extends Config
 {
 	@ConfigItem(
-		keyName = "ignoreAllItems",
-		name = "Ignore all items?",
+		keyName = "disableForAllItems",
+		name = "All items",
 		description = "Prevent the cancellation of actions on all items."
 	)
 
-	default boolean ignoreAllItems()
+	default boolean disableForAllItems()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(
-		keyName = "ignoreAllSpell",
-		name = "Ignore all spells?",
+		keyName = "disableForAllSpells",
+		name = "All spells",
 		description = "Prevent the cancellation of actions on all spells."
 	)
 
-	default boolean ignoreAllSpells()
+	default boolean disableForAllSpells()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(

@@ -31,10 +31,10 @@ public class DisableCancelPlugin extends Plugin {
 	private DisableCancelConfig config;
 
 	private boolean itemIgnored(int itemId) {
-		final boolean cfgIgnoreAllItems = config.ignoreAllItems();
+		final boolean cfgDisableForAllItems = config.disableForAllSpells();
 
-		if (cfgIgnoreAllItems) {
-			return true;
+		if (cfgDisableForAllItems) {
+			return false;
 		}
 
 		final String itemName = itemManager.getItemComposition(itemId).getMembersName().toLowerCase();
@@ -48,10 +48,10 @@ public class DisableCancelPlugin extends Plugin {
 	}
 
 	private boolean spellIgnored(Widget widget) {
-		final boolean cfgIgnoreAllSpells = config.ignoreAllSpells();
+		final boolean cfgDisableForAllSpells = config.disableForAllItems();
 
-		if (cfgIgnoreAllSpells) {
-			return true;
+		if (cfgDisableForAllSpells) {
+			return false;
 		}
 
 		int spellId = widget.getId();
