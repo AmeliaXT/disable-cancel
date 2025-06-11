@@ -30,28 +30,24 @@ public class DisableCancelPlugin extends Plugin {
 	@Inject
 	private DisableCancelConfig config;
 
-	private boolean isItemAndIgnored(Widget widget) {
+	private boolean itemIgnored(int itemId) {
 		final boolean cfgIgnoreAllItems = config.ignoreAllItems();
 
 		if (cfgIgnoreAllItems) {
 			return true;
 		}
 
-		final int itemId = widget.getItemId();
+		final String itemName = itemManager.getItemComposition(itemId).getMembersName().toLowerCase();
+		final String[] cfgItemsToIgnore = config.itemsToIgnore().toLowerCase().split(" *, *");
 
-		if (itemId > 0) {
-			final String itemName = itemManager.getItemComposition(itemId).getMembersName().toLowerCase();
-			final String[] cfgItemsToIgnore = config.itemsToIgnore().toLowerCase().split(" *, *");
-
-			if (Arrays.asList(cfgItemsToIgnore).contains(itemName)) {
-				return true;
-			}
+		if (Arrays.asList(cfgItemsToIgnore).contains(itemName)) {
+			return true;
 		}
 
 		return false;
 	}
 
-	private boolean isSpellAndIgnored(Widget widget) {
+	private boolean spellIgnored(Widget widget) {
 		final boolean cfgIgnoreAllSpells = config.ignoreAllSpells();
 
 		if (cfgIgnoreAllSpells) {
@@ -94,11 +90,15 @@ public class DisableCancelPlugin extends Plugin {
 			return false;
 		}
 
-		if (isItemAndIgnored(selectedWidget)) {
+		final int itemId = selectedWidget.getItemId();
+
+		final boolean isItem = itemId > 0;
+
+		if (isItem && itemIgnored(itemId)) {
 			return false;
 		}
 
-		if (isSpellAndIgnored(selectedWidget)) {
+		if (!isItem && spellIgnored(selectedWidget)) {
 			return false;
 		}
 
