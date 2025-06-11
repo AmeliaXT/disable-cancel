@@ -8,9 +8,31 @@ import net.runelite.client.config.ConfigItem;
 public interface DisableCancelConfig extends Config
 {
 	@ConfigItem(
+		keyName = "ignoreAllItems",
+		name = "Ignore all items?",
+		description = "Prevent the cancellation of actions on all items."
+	)
+
+	default boolean ignoreAllItems()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "ignoreAllSpell",
+		name = "Ignore all spells?",
+		description = "Prevent the cancellation of actions on all spells."
+	)
+
+	default boolean ignoreAllSpells()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "itemsToIgnore",
 		name = "Ignore for items",
-		description = "Allows items to ignore the prevention of cancellation. Comma separated list, e.g. 'law rune, guam herb'"
+		description = "Allows individual items to ignore the prevention of cancellation. Comma separated list, e.g. 'law rune, guam herb'"
 	)
 
 	default String itemsToIgnore()
@@ -21,7 +43,7 @@ public interface DisableCancelConfig extends Config
 	@ConfigItem(
 		keyName = "spellsToIgnore",
 		name = "Ignore for spells",
-		description = "Allows spells to ignore the prevention of cancellation. Comma separated list, e.g. 'telekinetic grab, ice barrage'"
+		description = "Allows inidvidual spells to ignore the prevention of cancellation. Comma separated list, e.g. 'telekinetic grab, ice barrage'"
 	)
 
 	default String spellsToIgnore()

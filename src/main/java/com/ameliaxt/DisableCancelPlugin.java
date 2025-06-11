@@ -31,6 +31,12 @@ public class DisableCancelPlugin extends Plugin {
 	private DisableCancelConfig config;
 
 	private boolean isItemAndIgnored(Widget widget) {
+		final boolean cfgIgnoreAllItems = config.ignoreAllItems();
+
+		if (cfgIgnoreAllItems) {
+			return true;
+		}
+
 		final int itemId = widget.getItemId();
 
 		if (itemId > 0) {
@@ -46,6 +52,12 @@ public class DisableCancelPlugin extends Plugin {
 	}
 
 	private boolean isSpellAndIgnored(Widget widget) {
+		final boolean cfgIgnoreAllSpells = config.ignoreAllSpells();
+
+		if (cfgIgnoreAllSpells) {
+			return true;
+		}
+
 		int spellId = widget.getId();
 
 		String spellString = TARGETABLE_SPELL_MAP.get(spellId);
