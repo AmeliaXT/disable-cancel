@@ -57,6 +57,7 @@ public class TargetableSpells {
         Map.entry(MagicSpellbook.LOW_ALCHEMY, "low alchemy"),
         Map.entry(MagicSpellbook.MAGIC_DART, "magic dart"),
         Map.entry(MagicSpellbook.MONSTER_EXAMINE, "monster examine"),
+        Map.entry(MagicSpellbook.PLANK_MAKE, "plank make"),
         Map.entry(MagicSpellbook.REANIMATION_ADEPT, "adept reanimation"),
         Map.entry(MagicSpellbook.REANIMATION_BASIC, "basic reanimation"),
         Map.entry(MagicSpellbook.REANIMATION_EXPERT, "expert reanimation"),
