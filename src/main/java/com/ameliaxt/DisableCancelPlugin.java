@@ -14,6 +14,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
+import java.awt.Rectangle;
 import java.util.Arrays;
 
 import static com.ameliaxt.TargetableSpells.TARGETABLE_SPELL_MAP;
@@ -71,6 +72,17 @@ public class DisableCancelPlugin extends Plugin {
 		return false;
 	}
 
+	private boolean isReclickOnSelectedWidget(Widget selectedWidget) {
+		final Rectangle bounds = selectedWidget.getBounds();
+		final Point mouse = client.getMouseCanvasPosition();
+
+		if (bounds == null || mouse == null) {
+			return false;
+		}
+
+		return bounds.contains(mouse.getX(), mouse.getY());
+	}
+
 	private boolean disableForRightClickOption() {
 		final boolean cfgLeftClickOnly = config.leftClickOnly();
 
@@ -106,6 +118,10 @@ public class DisableCancelPlugin extends Plugin {
 			}
 
 			if (!isItem && disableCancelForSpell(selectedWidget)) {
+				if (config.reclickSpellToCancel() && isReclickOnSelectedWidget(selectedWidget)) {
+					return false;
+				}
+
 				return true;
 			}
 		}
