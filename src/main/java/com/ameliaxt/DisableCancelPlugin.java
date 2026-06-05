@@ -73,6 +73,10 @@ public class DisableCancelPlugin extends Plugin {
 	}
 
 	private boolean isReclickOnSelectedWidget(Widget selectedWidget) {
+		if (selectedWidget.isHidden()) {
+			return false;
+		}
+
 		final Rectangle bounds = selectedWidget.getBounds();
 		final Point mouse = client.getMouseCanvasPosition();
 
