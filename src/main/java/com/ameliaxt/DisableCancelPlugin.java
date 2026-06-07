@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -36,46 +35,28 @@ public class DisableCancelPlugin extends Plugin {
 	@Inject
 	private KeyManager keyManager;
 
-	@Inject
-	private ClientThread clientThread;
+	private volatile boolean bypassNextCancel;
 
-	private boolean invokingHotkeyCancel;
-
-	private final HotkeyListener cancelHotkeyListener = new HotkeyListener(() -> config.cancelHotkey())
+	private final HotkeyListener bypassHotkeyListener = new HotkeyListener(() -> config.bypassHotkey())
 	{
 		@Override
 		public void hotkeyPressed()
 		{
-			clientThread.invoke(() ->
-			{
-				if (client.getSelectedWidget() == null)
-				{
-					return;
-				}
-
-				invokingHotkeyCancel = true;
-				try
-				{
-					client.menuAction(0, 0, MenuAction.CANCEL, 0, -1, "Cancel", "");
-				}
-				finally
-				{
-					invokingHotkeyCancel = false;
-				}
-			});
+			bypassNextCancel = true;
 		}
 	};
 
 	@Override
 	protected void startUp()
 	{
-		keyManager.registerKeyListener(cancelHotkeyListener);
+		keyManager.registerKeyListener(bypassHotkeyListener);
 	}
 
 	@Override
 	protected void shutDown()
 	{
-		keyManager.unregisterKeyListener(cancelHotkeyListener);
+		keyManager.unregisterKeyListener(bypassHotkeyListener);
+		bypassNextCancel = false;
 	}
 
 	private boolean disableCancelForItem(int itemId) {
@@ -135,10 +116,10 @@ public class DisableCancelPlugin extends Plugin {
 		final boolean isCancel = action == MenuAction.CANCEL;
 
 		if (isCancel) {
-			if (invokingHotkeyCancel) {
+			if (bypassNextCancel) {
+				bypassNextCancel = false;
 				return false;
 			}
-
 
 			if (client.isMenuOpen() && disableForRightClickOption()) {
 				return false;

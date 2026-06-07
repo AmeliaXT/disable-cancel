@@ -64,12 +64,12 @@ public interface DisableCancelConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "cancelHotkey",
-		name = "Cancel hotkey",
-		description = "Hotkey that cancels the currently selected item or spell when pressed."
+		keyName = "bypassHotkey",
+		name = "Bypass hotkey",
+		description = "Press to allow the next left click to cancel the selected item or spell as if the plugin were disabled."
 	)
 
-	default Keybind cancelHotkey()
+	default Keybind bypassHotkey()
 	{
 		return Keybind.NOT_SET;
 	}
