@@ -8,11 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.util.HotkeyListener;
 
 import java.util.Arrays;
 
@@ -29,6 +32,51 @@ public class DisableCancelPlugin extends Plugin {
 
 	@Inject
 	private DisableCancelConfig config;
+
+	@Inject
+	private KeyManager keyManager;
+
+	@Inject
+	private ClientThread clientThread;
+
+	private boolean invokingHotkeyCancel;
+
+	private final HotkeyListener cancelHotkeyListener = new HotkeyListener(() -> config.cancelHotkey())
+	{
+		@Override
+		public void hotkeyPressed()
+		{
+			clientThread.invoke(() ->
+			{
+				if (client.getSelectedWidget() == null)
+				{
+					return;
+				}
+
+				invokingHotkeyCancel = true;
+				try
+				{
+					client.menuAction(0, 0, MenuAction.CANCEL, 0, -1, "Cancel", "");
+				}
+				finally
+				{
+					invokingHotkeyCancel = false;
+				}
+			});
+		}
+	};
+
+	@Override
+	protected void startUp()
+	{
+		keyManager.registerKeyListener(cancelHotkeyListener);
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		keyManager.unregisterKeyListener(cancelHotkeyListener);
+	}
 
 	private boolean disableCancelForItem(int itemId) {
 		final boolean cfgDisableForAllItems = config.disableForAllItems();
@@ -87,6 +135,11 @@ public class DisableCancelPlugin extends Plugin {
 		final boolean isCancel = action == MenuAction.CANCEL;
 
 		if (isCancel) {
+			if (invokingHotkeyCancel) {
+				return false;
+			}
+
+
 			if (client.isMenuOpen() && disableForRightClickOption()) {
 				return false;
 			}
