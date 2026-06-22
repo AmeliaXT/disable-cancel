@@ -16,6 +16,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 import java.awt.Rectangle;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import static com.ameliaxt.TargetableSpells.TARGETABLE_SPELL_MAP;
 
@@ -41,11 +42,7 @@ public class DisableCancelPlugin extends Plugin {
 		final String itemName = itemManager.getItemComposition(itemId).getMembersName().toLowerCase();
 		final String[] cfgDisableCancelOnItems = config.disableCancelOnItems().toLowerCase().split(" *, *");
 
-		if (Arrays.asList(cfgDisableCancelOnItems).contains(itemName)) {
-			return true;
-		}
-
-		return false;
+		return matchesAny(itemName, cfgDisableCancelOnItems);
 	}
 
 	private boolean disableCancelForSpell(Widget widget) {
@@ -65,8 +62,40 @@ public class DisableCancelPlugin extends Plugin {
 
 		final String[] cfgDisableCancelOnSpells = config.disableCancelOnSpells().toLowerCase().split(" *, *");
 
-		if (Arrays.asList(cfgDisableCancelOnSpells).contains(spellString)) {
-			return true;
+		return matchesAny(spellString, cfgDisableCancelOnSpells);
+	}
+
+	static boolean matchesAny(String name, String[] patterns) {
+		for (String pattern : patterns) {
+			if (pattern.isEmpty()) {
+				continue;
+			}
+
+			if (pattern.indexOf('*') < 0) {
+				if (pattern.equals(name)) {
+					return true;
+				}
+				continue;
+			}
+
+			StringBuilder regex = new StringBuilder();
+			int start = 0;
+			for (int i = 0; i < pattern.length(); i++) {
+				if (pattern.charAt(i) == '*') {
+					if (i > start) {
+						regex.append(Pattern.quote(pattern.substring(start, i)));
+					}
+					regex.append(".*");
+					start = i + 1;
+				}
+			}
+			if (start < pattern.length()) {
+				regex.append(Pattern.quote(pattern.substring(start)));
+			}
+
+			if (name.matches(regex.toString())) {
+				return true;
+			}
 		}
 
 		return false;
