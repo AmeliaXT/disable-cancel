@@ -61,4 +61,15 @@ public interface DisableCancelConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "reclickSpellToCancel",
+		name = "Re-click spell to cancel",
+		description = "Allow re-clicking the currently selected spell to cancel the selection."
+	)
+
+	default boolean reclickSpellToCancel()
+	{
+		return true;
+	}
 }
