@@ -3,6 +3,7 @@ package com.ameliaxt;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Keybind;
 
 @ConfigGroup("disable-cancel")
 public interface DisableCancelConfig extends Config
@@ -71,5 +72,16 @@ public interface DisableCancelConfig extends Config
 	default boolean reclickSpellToCancel()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "bypassHotkey",
+		name = "Bypass hotkey",
+		description = "Press to allow the next left click to cancel the selected item or spell as if the plugin were disabled."
+	)
+
+	default Keybind bypassHotkey()
+	{
+		return Keybind.NOT_SET;
 	}
 }

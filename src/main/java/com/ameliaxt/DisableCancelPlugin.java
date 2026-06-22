@@ -11,8 +11,10 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.util.HotkeyListener;
 
 import java.awt.Rectangle;
 import java.util.Arrays;
@@ -31,6 +33,33 @@ public class DisableCancelPlugin extends Plugin {
 
 	@Inject
 	private DisableCancelConfig config;
+
+	@Inject
+	private KeyManager keyManager;
+
+	private volatile boolean bypassNextCancel;
+
+	private final HotkeyListener bypassHotkeyListener = new HotkeyListener(() -> config.bypassHotkey())
+	{
+		@Override
+		public void hotkeyPressed()
+		{
+			bypassNextCancel = true;
+		}
+	};
+
+	@Override
+	protected void startUp()
+	{
+		keyManager.registerKeyListener(bypassHotkeyListener);
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		keyManager.unregisterKeyListener(bypassHotkeyListener);
+		bypassNextCancel = false;
+	}
 
 	private boolean disableCancelForItem(int itemId) {
 		final boolean cfgDisableForAllItems = config.disableForAllItems();
@@ -132,6 +161,11 @@ public class DisableCancelPlugin extends Plugin {
 		final boolean isCancel = action == MenuAction.CANCEL;
 
 		if (isCancel) {
+			if (bypassNextCancel) {
+				bypassNextCancel = false;
+				return false;
+			}
+
 			if (client.isMenuOpen() && disableForRightClickOption()) {
 				return false;
 			}
